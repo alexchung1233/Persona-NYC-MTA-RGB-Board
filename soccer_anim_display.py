@@ -2,7 +2,7 @@ from PIL import Image, ImageSequence
 
 import time
 
-GIF_PATH = "assets/soccer_player_kicking.gif"
+GIF_PATH = "assets/soccer_nerd_dribble.gif"
 DEFAULT_FRAME_DURATION = 0.1  # seconds; fallback for frames with no/zero duration
 
 
