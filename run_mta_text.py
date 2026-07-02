@@ -45,11 +45,13 @@ def draw_direction(train_data, direction):
     matrix.SetImage(logo, 0, y1 - LOGO_SIZE)
     matrix.SetImage(logo, 0, y2 - LOGO_SIZE)
 
-    name_len = graphics.DrawText(matrix, font, TEXT_X, y1, route_color, destination)
-    graphics.DrawText(matrix, font, TEXT_X + name_len, y1, white, f"  {trains[0]['minutes']} min")
+    idx1_len = graphics.DrawText(matrix, font, TEXT_X, y1, white, "1 ")
+    name_len = graphics.DrawText(matrix, font, TEXT_X + idx1_len, y1, route_color, destination)
+    graphics.DrawText(matrix, font, TEXT_X + idx1_len + name_len, y1, white, f"  {trains[0]['minutes']} min")
 
-    name_len = graphics.DrawText(matrix, font, TEXT_X, y2, route_color, destination)
-    graphics.DrawText(matrix, font, TEXT_X + name_len, y2, white, f"  {trains[1]['minutes']} min")
+    idx2_len = graphics.DrawText(matrix, font, TEXT_X, y2, white, "2 ")
+    name_len = graphics.DrawText(matrix, font, TEXT_X + idx2_len, y2, route_color, destination)
+    graphics.DrawText(matrix, font, TEXT_X + idx2_len + name_len, y2, white, f"  {trains[1]['minutes']} min")
 
 try:
     while True:
