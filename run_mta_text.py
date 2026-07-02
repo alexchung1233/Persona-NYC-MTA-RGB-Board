@@ -32,7 +32,7 @@ TEXT_X = LOGO_SIZE + 2
 
 matrix.Clear()
 
-def draw_direction(train_data, direction):
+def draw_direction(train_data, direction, pair):
     matrix.Clear()
     route_color = graphics.Color(*route_config["color"])
     white = graphics.Color(255, 255, 255)
@@ -41,26 +41,34 @@ def draw_direction(train_data, direction):
     trains = train_data[direction]
 
     y1, y2 = 10, 22
+    i = pair * 2
+    labels = (i + 1, i + 2)
 
     matrix.SetImage(logo, 0, y1 - LOGO_SIZE)
     matrix.SetImage(logo, 0, y2 - LOGO_SIZE)
 
-    idx1_len = graphics.DrawText(matrix, font, TEXT_X, y1, white, "1 ")
+    idx1_len = graphics.DrawText(matrix, font, TEXT_X, y1, white, f"{labels[0]} ")
     name_len = graphics.DrawText(matrix, font, TEXT_X + idx1_len, y1, route_color, destination)
-    graphics.DrawText(matrix, font, TEXT_X + idx1_len + name_len, y1, white, f"  {trains[0]['minutes']} min")
+    graphics.DrawText(matrix, font, TEXT_X + idx1_len + name_len, y1, white, f"  {trains[i]['minutes']} min")
 
-    idx2_len = graphics.DrawText(matrix, font, TEXT_X, y2, white, "2 ")
+    idx2_len = graphics.DrawText(matrix, font, TEXT_X, y2, white, f"{labels[1]} ")
     name_len = graphics.DrawText(matrix, font, TEXT_X + idx2_len, y2, route_color, destination)
-    graphics.DrawText(matrix, font, TEXT_X + idx2_len + name_len, y2, white, f"  {trains[1]['minutes']} min")
+    graphics.DrawText(matrix, font, TEXT_X + idx2_len + name_len, y2, white, f"  {trains[i + 1]['minutes']} min")
 
 try:
     while True:
-        train_data = api.get_next_trains()
+        train_data = api.get_next_trains(num=4)
 
-        draw_direction(train_data, "N")
+        draw_direction(train_data, "N", pair=0)
         time.sleep(5)
 
-        draw_direction(train_data, "S")
+        draw_direction(train_data, "S", pair=0)
+        time.sleep(5)
+
+        draw_direction(train_data, "N", pair=1)
+        time.sleep(5)
+
+        draw_direction(train_data, "S", pair=1)
         time.sleep(5)
 
 except KeyboardInterrupt:
