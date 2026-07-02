@@ -1,5 +1,5 @@
 from matrix_factory import create_matrix
-from mta_display import MtaDisplay
+from views.mta_display import MtaDisplay
 
 matrix = create_matrix()
 display = MtaDisplay(matrix)

@@ -1,17 +1,25 @@
-from matrix_factory import create_matrix
-from mta_display import MtaDisplay
-from knicks_display import KnicksDisplay
+from itertools import cycle
 
-MTA_DURATION = 5 * 60  # seconds of MTA train times between Knicks interludes
-KNICKS_DURATION = 10  # seconds of Knicks scroll per interlude
+from matrix_factory import create_matrix
+from views.mta_display import MtaDisplay
+from views.knicks_display import KnicksDisplay
+from views.soccer_anim_display import SoccerAnimDisplay
+
+MTA_DURATION = 5 * 60  # seconds of MTA train times between interludes
+INTERLUDE_DURATION = 10  # seconds each interlude animation plays
 
 matrix = create_matrix()
 mta_display = MtaDisplay(matrix)
-knicks_display = KnicksDisplay(matrix)
+
+# Add more display classes here to rotate them in as interludes.
+interludes = cycle([
+    SoccerAnimDisplay(matrix),
+    KnicksDisplay(matrix),
+])
 
 try:
     while True:
+        next(interludes).run(duration=INTERLUDE_DURATION)
         mta_display.run(duration=MTA_DURATION)
-        knicks_display.run(duration=KNICKS_DURATION)
 except KeyboardInterrupt:
     matrix.Clear()

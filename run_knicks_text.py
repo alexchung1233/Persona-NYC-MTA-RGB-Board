@@ -1,5 +1,5 @@
 from matrix_factory import create_matrix
-from knicks_display import KnicksDisplay
+from views.knicks_display import KnicksDisplay
 
 matrix = create_matrix()
 display = KnicksDisplay(matrix)
