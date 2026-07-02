@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 LOGO_PATH = "assets/knicks-logo.png"
-FONT_PATH = "fonts/nba-knicks-9.bdf"
+FONT_PATH = "fonts/nba-knicks-16.bdf"
 SCROLL_SPEED = 0.03  # seconds between frames; lower is faster
-LOGO_GAP = 4  # pixels between the end of the text and the logo
+LOGO_GAP = 4  # pixels between the logo and the text
 
 KNICKS_BLUE = graphics.Color(0, 107, 182)
 KNICKS_ORANGE = graphics.Color(245, 132, 38)
@@ -58,11 +58,11 @@ try:
 
         canvas.Clear()
 
-        x = x_group
+        canvas.SetImage(logo, x_group, logo_y)
+
+        x = x_group + logo_width + LOGO_GAP
         for word, color in WORDS:
             x += graphics.DrawText(canvas, font, x, text_y, color, word)
-
-        canvas.SetImage(logo, x_group + text_width + LOGO_GAP, logo_y)
         canvas = matrix.SwapOnVSync(canvas)
 
         time.sleep(SCROLL_SPEED)
