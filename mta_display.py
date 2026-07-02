@@ -57,7 +57,15 @@ class MtaDisplay:
         while deadline is None or time.monotonic() < deadline:
             train_data = api.get_next_trains(num=4)
 
-            for direction, pair in PAIRS:
+            # Only show pairs the fetched data actually has two trains for;
+            # off-peak/late-night service can return fewer than 4 per direction.
+            pairs = [(d, p) for d, p in PAIRS if len(train_data[d]) >= p * 2 + 2]
+
+            if not pairs:
+                time.sleep(PAIR_SLEEP)
+                continue
+
+            for direction, pair in pairs:
                 if deadline is not None and time.monotonic() >= deadline:
                     return
                 self.draw_direction(train_data, direction, pair)
