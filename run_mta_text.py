@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FONT_PATH = "fonts/helvetica-8.bdf"
+FONT_PATH = "fonts/helvetica-9.bdf"
 ROUTES = route_constants.ROUTES
 
 options = RGBMatrixOptions()
