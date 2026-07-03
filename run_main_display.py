@@ -19,7 +19,7 @@ interludes = cycle([
 
 try:
     while True:
-        next(interludes).run(duration=INTERLUDE_DURATION)
         mta_display.run(duration=MTA_DURATION)
+        next(interludes).run(duration=INTERLUDE_DURATION)
 except KeyboardInterrupt:
     matrix.Clear()
