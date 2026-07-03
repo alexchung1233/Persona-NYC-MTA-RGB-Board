@@ -21,7 +21,6 @@ class MtaDisplay:
 
         self.logo = Image.open(self.route_config["logo"]).convert("RGB")
         self.logo = self.logo.resize((LOGO_SIZE, LOGO_SIZE), Image.LANCZOS)
-        self.text_x = LOGO_SIZE + 2
 
     def draw_direction(self, train_data, direction, pair):
         self.matrix.Clear()
@@ -35,16 +34,18 @@ class MtaDisplay:
         i = pair * 2
         labels = (i + 1, i + 2)
 
-        self.matrix.SetImage(self.logo, 0, y1 - LOGO_SIZE)
-        self.matrix.SetImage(self.logo, 0, y2 - LOGO_SIZE)
+        self._draw_row(y1, labels[0], trains[i]["minutes"], destination, route_color, white)
+        self._draw_row(y2, labels[1], trains[i + 1]["minutes"], destination, route_color, white)
 
-        idx1_len = graphics.DrawText(self.matrix, self.font, self.text_x, y1, white, f"{labels[0]} ")
-        name_len = graphics.DrawText(self.matrix, self.font, self.text_x + idx1_len, y1, route_color, destination)
-        graphics.DrawText(self.matrix, self.font, self.text_x + idx1_len + name_len, y1, white, f"  {trains[i]['minutes']} min")
+    def _draw_row(self, y, label, minutes, destination, route_color, white):
+        # Order: index, route logo, destination, time -- e.g. "1 (7) Hudson Yards  3 min"
+        x = graphics.DrawText(self.matrix, self.font, 0, y, white, f"{label} ")
 
-        idx2_len = graphics.DrawText(self.matrix, self.font, self.text_x, y2, white, f"{labels[1]} ")
-        name_len = graphics.DrawText(self.matrix, self.font, self.text_x + idx2_len, y2, route_color, destination)
-        graphics.DrawText(self.matrix, self.font, self.text_x + idx2_len + name_len, y2, white, f"  {trains[i + 1]['minutes']} min")
+        self.matrix.SetImage(self.logo, x, y - LOGO_SIZE)
+        x += LOGO_SIZE + 2
+
+        x += graphics.DrawText(self.matrix, self.font, x, y, route_color, f"{destination} ")
+        graphics.DrawText(self.matrix, self.font, x, y, white, f" {minutes} min")
 
     def run(self, duration=None):
         """Cycle through the N/S train pairs, refetching after each full cycle.
