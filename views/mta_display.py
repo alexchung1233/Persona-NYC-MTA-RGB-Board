@@ -7,7 +7,7 @@ import route_constants
 
 FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
-PAIR_SLEEP = 5  # seconds each pair of trains is shown
+PAIR_SLEEP = 3  # seconds each pair of trains is shown
 PAIRS = [("N", 0), ("S", 0), ("N", 1), ("S", 1)]
 
 
