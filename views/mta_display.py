@@ -2,6 +2,8 @@ from rgbmatrix import graphics
 from PIL import Image
 
 import time
+from datetime import datetime
+
 import mta_api_lib as api
 import route_constants
 
@@ -11,6 +13,7 @@ FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
 CLOCK_DURATION = 3  # seconds the clock shows after each full pair cycle
+BOTTOM_CLOCK_Y = 30  # baseline for the small clock at the bottom of each frame
 PAIRS = [("N", 0), ("S", 0), ("N", 1), ("S", 1)]
 
 
@@ -41,6 +44,7 @@ class MtaDisplay:
 
         self._draw_row(y1, labels[0], trains[i]["minutes"], destination, route_color, white)
         self._draw_row(y2, labels[1], trains[i + 1]["minutes"], destination, route_color, white)
+        self._draw_bottom_clock(white)
 
     def _draw_row(self, y, label, minutes, destination, route_color, white):
         # Order: index, route logo, destination, time -- e.g. "1 (7) Hudson Yards  3 min"
@@ -51,6 +55,12 @@ class MtaDisplay:
 
         x += graphics.DrawText(self.matrix, self.font, x, y, route_color, f"{destination} ")
         graphics.DrawText(self.matrix, self.font, x, y, white, f" {minutes} min")
+
+    def _draw_bottom_clock(self, white):
+        time_text = datetime.now().strftime("%-I:%M %p")
+        width = sum(self.font.CharacterWidth(ord(char)) for char in time_text)
+        x = (self.matrix.width - width) // 2
+        graphics.DrawText(self.matrix, self.font, x, BOTTOM_CLOCK_Y, white, time_text)
 
     def run(self, duration=None):
         """Cycle through the N/S train pairs, refetching after each full cycle,
