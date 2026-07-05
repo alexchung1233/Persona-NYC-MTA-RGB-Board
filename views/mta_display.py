@@ -5,9 +5,12 @@ import time
 import mta_api_lib as api
 import route_constants
 
+from .clock_display import ClockDisplay
+
 FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
+CLOCK_DURATION = 3  # seconds the clock shows after each full pair cycle
 PAIRS = [("N", 0), ("S", 0), ("N", 1), ("S", 1)]
 
 
@@ -21,6 +24,8 @@ class MtaDisplay:
 
         self.logo = Image.open(self.route_config["logo"]).convert("RGB")
         self.logo = self.logo.resize((LOGO_SIZE, LOGO_SIZE), Image.LANCZOS)
+
+        self.clock = ClockDisplay(matrix)
 
     def draw_direction(self, train_data, direction, pair):
         self.matrix.Clear()
@@ -48,7 +53,8 @@ class MtaDisplay:
         graphics.DrawText(self.matrix, self.font, x, y, white, f" {minutes} min")
 
     def run(self, duration=None):
-        """Cycle through the N/S train pairs, refetching after each full cycle.
+        """Cycle through the N/S train pairs, refetching after each full cycle,
+        showing the clock for a few seconds between cycles.
 
         Runs forever if duration is None, otherwise stops once duration
         seconds have elapsed (mid-cycle if need be).
@@ -71,3 +77,7 @@ class MtaDisplay:
                     return
                 self.draw_direction(train_data, direction, pair)
                 time.sleep(PAIR_SLEEP)
+
+            if deadline is not None and time.monotonic() >= deadline:
+                return
+            self.clock.run(duration=CLOCK_DURATION)
