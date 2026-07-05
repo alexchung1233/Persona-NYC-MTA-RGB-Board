@@ -10,7 +10,7 @@ import route_constants
 from .clock_display import ClockDisplay
 
 FONT_PATH = "fonts/helvetica-9.bdf"
-BOTTOM_CLOCK_FONT_PATH = "fonts/helvetica-8.bdf"
+BOTTOM_CLOCK_FONT_PATH = "fonts/5x7.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
 CLOCK_DURATION = 3  # seconds the clock shows after each full pair cycle
