@@ -11,9 +11,9 @@ REFRESH = 1  # seconds between time redraws
 
 KNICKS_ORANGE = graphics.Color(245, 132, 38)
 
-# The Knicks font has no colon glyph, so the time is space-separated
-# instead of "H:MM" (e.g. "3 07 PM").
-TIME_FORMAT = "%-I %M %p"
+# The Knicks font has no colon glyph, so it's hand-drawn as two dots.
+COLON_DOT_SIZE = 2
+COLON_PADDING = 1  # pixels on each side of the dots
 
 
 class ClockDisplay:
@@ -39,6 +39,19 @@ class ClockDisplay:
     def _text_width(self, text):
         return sum(self.font.CharacterWidth(ord(char)) for char in text)
 
+    def _draw_colon(self, x, color):
+        # Two square dots spanning the digits' cap-height, in place of a colon glyph.
+        cap_height = self.font.baseline
+        top = self.text_y - round(cap_height * 0.72)
+        bottom = self.text_y - round(cap_height * 0.28)
+
+        for dy in range(COLON_DOT_SIZE):
+            for dx in range(COLON_DOT_SIZE):
+                self.matrix.SetPixel(x + COLON_PADDING + dx, top + dy, color.red, color.green, color.blue)
+                self.matrix.SetPixel(x + COLON_PADDING + dx, bottom + dy, color.red, color.green, color.blue)
+
+        return COLON_PADDING + COLON_DOT_SIZE + COLON_PADDING
+
     def run(self, duration=None):
         """Show the Knicks logo and current time, centered on the panel.
 
@@ -48,12 +61,22 @@ class ClockDisplay:
         deadline = time.monotonic() + duration if duration is not None else None
 
         while deadline is None or time.monotonic() < deadline:
-            time_text = datetime.now().strftime(TIME_FORMAT)
-            group_width = self.logo_width + LOGO_GAP + self._text_width(time_text)
-            x = (self.matrix.width - group_width) // 2
+            now = datetime.now()
+            hour = now.strftime("%-I")
+            minute = now.strftime("%M")
+            am_pm = f" {now.strftime('%p')}"
+
+            colon_width = COLON_PADDING + COLON_DOT_SIZE + COLON_PADDING
+            time_width = self._text_width(hour) + colon_width + self._text_width(minute) + self._text_width(am_pm)
+            x = (self.matrix.width - (self.logo_width + LOGO_GAP + time_width)) // 2
 
             self.matrix.Clear()
             self.matrix.SetImage(self.logo, x, self.logo_y)
-            graphics.DrawText(self.matrix, self.font, x + self.logo_width + LOGO_GAP, self.text_y, KNICKS_ORANGE, time_text)
+            x += self.logo_width + LOGO_GAP
+
+            x += graphics.DrawText(self.matrix, self.font, x, self.text_y, KNICKS_ORANGE, hour)
+            x += self._draw_colon(x, KNICKS_ORANGE)
+            x += graphics.DrawText(self.matrix, self.font, x, self.text_y, KNICKS_ORANGE, minute)
+            graphics.DrawText(self.matrix, self.font, x, self.text_y, KNICKS_ORANGE, am_pm)
 
             time.sleep(REFRESH)
