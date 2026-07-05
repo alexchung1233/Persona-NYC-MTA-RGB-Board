@@ -10,6 +10,7 @@ import route_constants
 from .clock_display import ClockDisplay
 
 FONT_PATH = "fonts/helvetica-9.bdf"
+BOTTOM_CLOCK_FONT_PATH = "fonts/helvetica-8.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
 CLOCK_DURATION = 3  # seconds the clock shows after each full pair cycle
@@ -24,6 +25,9 @@ class MtaDisplay:
 
         self.font = graphics.Font()
         self.font.LoadFont(FONT_PATH)
+
+        self.bottom_clock_font = graphics.Font()
+        self.bottom_clock_font.LoadFont(BOTTOM_CLOCK_FONT_PATH)
 
         self.logo = Image.open(self.route_config["logo"]).convert("RGB")
         self.logo = self.logo.resize((LOGO_SIZE, LOGO_SIZE), Image.LANCZOS)
@@ -58,9 +62,9 @@ class MtaDisplay:
 
     def _draw_bottom_clock(self, white):
         time_text = datetime.now().strftime("%-I:%M %p")
-        width = sum(self.font.CharacterWidth(ord(char)) for char in time_text)
+        width = sum(self.bottom_clock_font.CharacterWidth(ord(char)) for char in time_text)
         x = (self.matrix.width - width) // 2
-        graphics.DrawText(self.matrix, self.font, x, BOTTOM_CLOCK_Y, white, time_text)
+        graphics.DrawText(self.matrix, self.bottom_clock_font, x, BOTTOM_CLOCK_Y, white, time_text)
 
     def run(self, duration=None):
         """Cycle through the N/S train pairs, refetching after each full cycle,
