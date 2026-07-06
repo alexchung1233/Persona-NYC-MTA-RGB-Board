@@ -11,7 +11,8 @@ from .clock_display import ClockDisplay
 FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
-CLOCK_DURATION = 3  # seconds the clock shows after each full pair cycle
+CLOCK_DURATION = 3  # seconds the clock shows between groups of pairs
+PAIRS_PER_CLOCK = 2  # show the clock after this many pairs (uptown + downtown)
 PAIRS = [("N", 0), ("S", 0), ("N", 1), ("S", 1)]
 
 
@@ -55,7 +56,7 @@ class MtaDisplay:
 
     def run(self, duration=None):
         """Cycle through the N/S train pairs, refetching after each full cycle,
-        showing the clock for a few seconds between cycles.
+        showing the clock for a few seconds after every PAIRS_PER_CLOCK pairs.
 
         Runs forever if duration is None, otherwise stops once duration
         seconds have elapsed (mid-cycle if need be).
@@ -73,12 +74,15 @@ class MtaDisplay:
                 time.sleep(PAIR_SLEEP)
                 continue
 
-            for direction, pair in pairs:
+            for chunk_start in range(0, len(pairs), PAIRS_PER_CLOCK):
+                chunk = pairs[chunk_start:chunk_start + PAIRS_PER_CLOCK]
+
+                for direction, pair in chunk:
+                    if deadline is not None and time.monotonic() >= deadline:
+                        return
+                    self.draw_direction(train_data, direction, pair)
+                    time.sleep(PAIR_SLEEP)
+
                 if deadline is not None and time.monotonic() >= deadline:
                     return
-                self.draw_direction(train_data, direction, pair)
-                time.sleep(PAIR_SLEEP)
-
-            if deadline is not None and time.monotonic() >= deadline:
-                return
-            self.clock.run(duration=CLOCK_DURATION)
+                self.clock.run(duration=CLOCK_DURATION)
