@@ -4,6 +4,7 @@ from matrix_factory import create_matrix
 from views.mta_display import MtaDisplay
 from views.knicks_display import KnicksDisplay
 from views.soccer_anim_display import SoccerAnimDisplay
+from views.ateez_display import AteezDisplay
 
 MTA_DURATION = 5 * 60  # seconds of MTA train times between interludes
 INTERLUDE_DURATION = 10  # seconds each interlude animation plays
@@ -15,6 +16,7 @@ mta_display = MtaDisplay(matrix)
 interludes = cycle([
     SoccerAnimDisplay(matrix),
     KnicksDisplay(matrix),
+    AteezDisplay(matrix),
 ])
 
 try:
