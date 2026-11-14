@@ -5,8 +5,9 @@ import time
 
 import weather_api_lib as api
 
-BIG_FONT_PATH = "fonts/sharetech-mono-20.bdf"
-SMALL_FONT_PATH = "fonts/sharetech-mono-9.bdf"
+# Hand-drawn X11 pixel fonts: crisper on the LEDs than scaled TrueType fonts.
+BIG_FONT_PATH = "fonts/10x20.bdf"
+SMALL_FONT_PATH = "fonts/6x10.bdf"
 ICON_DIR = "assets/weather"
 CONDITIONS = ("sunny", "cloudy", "rainy", "snow")
 ICON_FILES = {"sunny": "sunny.png", "cloudy": "cloud.png", "rainy": "rainy.png", "snow": "snow.png"}
@@ -14,8 +15,8 @@ ICON_FILES = {"sunny": "sunny.png", "cloudy": "cloud.png", "rainy": "rainy.png",
 ICON_GAP = 5  # pixels between the icon and the current temp
 COLUMN_GAP = 6  # pixels between the current temp and the high/low column
 
-# Baselines: the big digits span rows 9-22; the 7px-tall high/low lines span
-# rows 8-14 and 17-23, bracketing them with a 2px gap between the two.
+# Baselines: the 13px-tall big digits span rows 10-22; the 7px-tall high/low
+# lines span rows 8-14 and 17-23, bracketing them with a 2px gap between.
 BIG_BASELINE = 23
 HIGH_BASELINE = 15
 LOW_BASELINE = 24
