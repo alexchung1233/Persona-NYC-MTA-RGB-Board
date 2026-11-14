@@ -7,11 +7,13 @@ import mta_api_lib as api
 import route_constants
 
 from .clock_display import ClockDisplay
+from .weather_display import WeatherDisplay
 
 FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
 CLOCK_DURATION = 3  # seconds the clock shows between groups of pairs
+WEATHER_DURATION = 3  # seconds the weather shows right after the clock
 PAIRS_PER_CLOCK = 1  # show the clock after each direction (Flushing, clock, Hudson Yards, clock)
 PAIRS = [("N", 0), ("S", 0)]
 
@@ -28,6 +30,7 @@ class MtaDisplay:
         self.logo = self.logo.resize((LOGO_SIZE, LOGO_SIZE), Image.LANCZOS)
 
         self.clock = ClockDisplay(matrix)
+        self.weather = WeatherDisplay(matrix)
 
     def draw_direction(self, train_data, direction, pair):
         self.matrix.Clear()
@@ -56,7 +59,8 @@ class MtaDisplay:
 
     def run(self, duration=None):
         """Cycle through the N/S train pairs, refetching after each full cycle,
-        showing the clock for a few seconds after every PAIRS_PER_CLOCK pairs.
+        showing the clock and then the weather for a few seconds after every
+        PAIRS_PER_CLOCK pairs.
 
         Runs forever if duration is None, otherwise stops once duration
         seconds have elapsed (mid-cycle if need be).
@@ -86,3 +90,7 @@ class MtaDisplay:
                 if deadline is not None and time.monotonic() >= deadline:
                     return
                 self.clock.run(duration=CLOCK_DURATION)
+
+                if deadline is not None and time.monotonic() >= deadline:
+                    return
+                self.weather.run(duration=WEATHER_DURATION)
