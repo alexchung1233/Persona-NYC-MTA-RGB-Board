@@ -4,12 +4,18 @@ from PIL import Image
 import time
 from datetime import datetime
 
+import weather_api_lib as weather_api
+from .weather_display import temp_color
+
 LOGO_PATH = "assets/knicks-logo.png"
 FONT_PATH = "fonts/nba-knicks-16.bdf"
 LOGO_GAP = 4  # pixels between the logo and the time
 REFRESH = 1  # seconds between time redraws
 
 KNICKS_ORANGE = graphics.Color(245, 132, 38)
+
+TEMP_FONT_PATH = "fonts/tom-thumb.bdf"  # tiny 4x6 font for the corner temp
+TEMP_MARGIN = 1  # pixels from the bottom-right corner
 
 # The Knicks font has no colon glyph, so it's hand-drawn as two dots.
 COLON_DOT_SIZE = 2
@@ -36,8 +42,23 @@ class ClockDisplay:
 
         self.text_y = (matrix.height - self.font.height) // 2 + self.font.baseline
 
-    def _text_width(self, text):
-        return sum(self.font.CharacterWidth(ord(char)) for char in text)
+        self.temp_font = graphics.Font()
+        self.temp_font.LoadFont(TEMP_FONT_PATH)
+
+    def _text_width(self, text, font=None):
+        font = font or self.font
+        return sum(font.CharacterWidth(ord(char)) for char in text)
+
+    def _draw_temp(self):
+        """Tiny color-coded current temp in the bottom-right corner, if known."""
+        weather = weather_api.get_weather()
+        if weather is None:
+            return
+
+        text = f"{weather['current']}°"
+        x = self.matrix.width - TEMP_MARGIN - self._text_width(text, self.temp_font)
+        y = self.matrix.height - TEMP_MARGIN - (self.temp_font.height - self.temp_font.baseline)
+        graphics.DrawText(self.matrix, self.temp_font, x, y, temp_color(weather["current"]), text)
 
     def _draw_colon(self, x, color):
         # Two square dots spanning the digits' cap-height, in place of a colon glyph.
@@ -78,5 +99,6 @@ class ClockDisplay:
             x += self._draw_colon(x, KNICKS_ORANGE)
             x += graphics.DrawText(self.matrix, self.font, x, self.text_y, KNICKS_ORANGE, minute)
             graphics.DrawText(self.matrix, self.font, x, self.text_y, KNICKS_ORANGE, am_pm)
+            self._draw_temp()
 
             time.sleep(REFRESH)

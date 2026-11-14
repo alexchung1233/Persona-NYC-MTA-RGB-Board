@@ -32,6 +32,15 @@ HIGH_COLOR = graphics.Color(255, 110, 64)  # warm orange
 LOW_COLOR = graphics.Color(110, 160, 255)  # ice blue
 
 
+def temp_color(temp):
+    """Color for a current temp: cold, comfortable, or hot."""
+    if temp <= COLD_MAX:
+        return COLD_COLOR
+    if temp <= HOT_MIN:
+        return GOOD_COLOR
+    return HOT_COLOR
+
+
 class WeatherDisplay:
     def __init__(self, matrix):
         self.matrix = matrix
@@ -45,14 +54,6 @@ class WeatherDisplay:
             name: Image.open(f"{ICON_DIR}/{ICON_FILES[name]}").convert("RGB")
             for name in CONDITIONS
         }
-
-    @staticmethod
-    def _current_color(temp):
-        if temp <= COLD_MAX:
-            return COLD_COLOR
-        if temp <= HOT_MIN:
-            return GOOD_COLOR
-        return HOT_COLOR
 
     @staticmethod
     def _text_width(font, text):
@@ -73,7 +74,7 @@ class WeatherDisplay:
         self.matrix.SetImage(icon, x, (self.matrix.height - icon.height) // 2)
         x += icon.width + ICON_GAP
 
-        x += graphics.DrawText(self.matrix, self.big_font, x, BIG_BASELINE, self._current_color(weather["current"]), current)
+        x += graphics.DrawText(self.matrix, self.big_font, x, BIG_BASELINE, temp_color(weather["current"]), current)
         x += COLUMN_GAP
 
         graphics.DrawText(self.matrix, self.small_font, x, HIGH_BASELINE, HIGH_COLOR, high)
