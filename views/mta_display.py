@@ -12,8 +12,8 @@ FONT_PATH = "fonts/helvetica-9.bdf"
 LOGO_SIZE = 9
 PAIR_SLEEP = 3  # seconds each pair of trains is shown
 CLOCK_DURATION = 3  # seconds the clock shows between groups of pairs
-PAIRS_PER_CLOCK = 2  # show the clock after this many pairs (uptown + downtown)
-PAIRS = [("N", 0), ("S", 0), ("N", 1), ("S", 1)]
+PAIRS_PER_CLOCK = 1  # show the clock after each direction (Flushing, clock, Hudson Yards, clock)
+PAIRS = [("N", 0), ("S", 0)]
 
 
 class MtaDisplay:
@@ -64,10 +64,10 @@ class MtaDisplay:
         deadline = time.monotonic() + duration if duration is not None else None
 
         while deadline is None or time.monotonic() < deadline:
-            train_data = api.get_next_trains(num=4)
+            train_data = api.get_next_trains(num=2)
 
             # Only show pairs the fetched data actually has two trains for;
-            # off-peak/late-night service can return fewer than 4 per direction.
+            # off-peak/late-night service can return fewer than 2 per direction.
             pairs = [(d, p) for d, p in PAIRS if len(train_data[d]) >= p * 2 + 2]
 
             if not pairs:
