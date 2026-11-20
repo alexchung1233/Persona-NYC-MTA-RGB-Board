@@ -12,8 +12,12 @@ ST_LOWERY_40TH = "715"
 
 def get_next_trains(route="7",stop_id=ST_LOWERY_40TH, num=3):
     url = f"{MTA_API_URL}/by-route/{route}"
-    response = requests.get(url)
-    data = response.json()
+    empty = {"N": [], "S": []}
+    try:
+        response = requests.get(url, timeout=10)
+        data = response.json()
+    except (requests.RequestException, ValueError):
+        return empty
     now = datetime.now(timezone.utc)
 
     def to_minutes(t):
@@ -39,5 +43,5 @@ def get_next_trains(route="7",stop_id=ST_LOWERY_40TH, num=3):
                 "S": [{"route": t["route"], "minutes": to_minutes(t["time"])} for t in south],
             }
 
-
-
+    # Stop not in the feed (e.g. a service change skipping it): no trains.
+    return empty
